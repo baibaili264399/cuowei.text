@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<title>错位夜宵 · Galgame</title>
+<meta name="description" content="无 H · 校园向 · 三名可攻略角色 + 回归现实真结局的 Galgame" />
+<meta name="theme-color" content="#04060b" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="错位夜宵" />
+<meta name="format-detection" content="telephone=no" />
+<link rel="manifest" href="manifest.json" />
+<link rel="apple-touch-icon" href="assets/images/apple-touch-icon.png" />
+<link rel="icon" type="image/png" href="assets/images/favicon.png" />
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<div id="app">
+  <div class="stage" id="stage">
+
+    <!-- ============ 背景层 ============ -->
+    <div class="bg-layer bg-base"></div>
+    <div class="bg-layer bg-ambient"></div>
+    <canvas class="bg-layer bg-dust" id="dust"></canvas>
+    <div class="bg-layer bg-lines"></div>
+    <div class="bg-layer bg-vignette"></div>
+
+    <!-- ============ 标题屏 ============ -->
+    <section class="screen screen-title is-active" id="screen-title">
+
+      <div class="char-wrap" id="title-char-wrap">
+        <img class="char" id="title-char" src="assets/images/mascot.webp" alt="标题角色立绘" />
+      </div>
+
+      <div class="title-block">
+        <p class="title-kicker">GALGAME &nbsp;·&nbsp; 校园日常 &nbsp;/&nbsp; 命运救赎</p>
+        <h1 class="title-main">错位夜宵</h1>
+        <p class="title-sub">D I S P L A C E D &nbsp; M I D N I G H T &nbsp; S N A C K</p>
+      </div>
+
+      <nav class="menu" id="main-menu" aria-label="主菜单">
+        <button class="menu-item" type="button" data-action="new">
+          <span class="bar"></span>
+          <span class="label">开始游戏</span>
+          <span class="en">NEW&nbsp;GAME</span>
+        </button>
+        <button class="menu-item" type="button" data-action="continue">
+          <span class="bar"></span>
+          <span class="label">继续游戏</span>
+          <span class="en">CONTINUE</span>
+        </button>
+        <button class="menu-item" type="button" data-action="load">
+          <span class="bar"></span>
+          <span class="label">读取存档</span>
+          <span class="en">LOAD</span>
+        </button>
+        <button class="menu-item" type="button" data-action="slots">
+          <span class="bar"></span>
+          <span class="label">存档管理</span>
+          <span class="en">SAVE&nbsp;DATA</span>
+        </button>
+        <button class="menu-item" type="button" data-action="settings">
+          <span class="bar"></span>
+          <span class="label">游戏设置</span>
+          <span class="en">SETTINGS</span>
+        </button>
+        <button class="menu-item" type="button" data-action="about">
+          <span class="bar"></span>
+          <span class="label">关于本作</span>
+          <span class="en">ABOUT</span>
+        </button>
+      </nav>
+
+      <div class="side-info" id="side-info">
+        <p class="side-label">LAST&nbsp;SAVE</p>
+        <p class="side-value" id="side-latest">尚无存档记录</p>
+      </div>
+
+      <footer class="stage-footer">
+        <span class="foot-item">v0.1.0 · 第一章实装</span>
+        <span class="foot-item foot-hint">
+          <span class="hint-keyboard">↑ ↓ 选择 &nbsp;·&nbsp; Enter 确认 &nbsp;·&nbsp; Esc 返回</span>
+          <span class="hint-touch">轻点选择菜单项 &nbsp;·&nbsp; 建议横屏全屏游玩</span>
+        </span>
+        <span class="foot-item foot-store" id="foot-store">存储：检测中…</span>
+      </footer>
+    </section>
+
+    <!-- ============ 剧情屏（VN 演出） ============ -->
+    <section class="screen screen-game screen-vn" id="screen-game">
+
+      <!-- 背景双层交叉淡入 -->
+      <div class="vn-bg" id="vn-bg-a"></div>
+      <div class="vn-bg" id="vn-bg-b"></div>
+      <div class="vn-scrim"></div>
+
+      <!-- 立绘层（有角色时才出现，目前占位） -->
+      <div class="vn-chars" id="vn-chars"></div>
+
+      <!-- CG 特写层 -->
+      <div class="vn-cg" id="vn-cg" data-mode="inset">
+        <div class="vn-cg-scrim"></div>
+        <div class="vn-cg-frame"><img id="vn-cg-img" alt="" /></div>
+      </div>
+
+      <!-- 特效层 -->
+      <div class="vn-flashback" id="vn-flashback"></div>
+      <div class="vn-glitch" id="vn-glitch"></div>
+      <div class="vn-glow" id="vn-glow"></div>
+      <div class="vn-flash" id="vn-flash" data-color="white"></div>
+
+      <!-- 素材加载提示 -->
+      <div class="vn-loading" id="vn-loading">读取素材中…</div>
+
+      <!-- 顶部信息 -->
+      <div class="game-topbar">
+        <span class="tag" id="hud-chapter">第一章 · 醒在别人的身体里</span>
+        <span class="tag" id="hud-playtime">00:00:00</span>
+        <span class="tag tag-ghost" id="hud-line">0 / 0</span>
+      </div>
+
+      <!-- 地点标注 -->
+      <div class="vn-place" id="vn-place"></div>
+
+      <!-- 好感浮现 -->
+      <div class="vn-affinity" id="vn-affinity"></div>
+
+      <!-- 界面浮层（手机 / 名片 / 关系面板） -->
+      <div class="vn-ui" id="vn-ui"></div>
+
+      <!-- 选项 -->
+      <div class="vn-choice" id="vn-choice"></div>
+
+      <!-- 章节卡 -->
+      <div class="vn-card" id="vn-card">
+        <p class="vn-card-title" id="vn-card-title"></p>
+        <p class="vn-card-sub" id="vn-card-sub"></p>
+      </div>
+
+      <!-- 右侧竖排按钮 -->
+      <div class="vn-side">
+        <button class="vn-side-btn" type="button" data-action="vn-repeat"><b>回想</b><span>REPEAT</span></button>
+        <button class="vn-side-btn" type="button" data-action="vn-auto"><b>自动</b><span>AUTO</span></button>
+        <button class="vn-side-btn" type="button" data-action="vn-skip"><b>跳过</b><span>SKIP</span></button>
+        <button class="vn-side-btn" type="button" data-action="vn-config"><b>设置</b><span>CONFIG</span></button>
+      </div>
+
+      <!-- 对话框 -->
+      <div class="dialogue vn-box" id="vn-box" data-kind="say">
+        <div class="name-box" id="speaker">主角</div>
+        <div class="text-box">
+          <span id="dialogue-text"></span><span class="caret" id="caret">▼</span>
+        </div>
+      </div>
+
+      <!-- 底部按钮行 -->
+      <div class="vn-bar">
+        <button class="vn-tab" type="button" data-action="vn-qload">快读</button>
+        <button class="vn-tab" type="button" data-action="vn-qsave">快存</button>
+        <button class="vn-tab" type="button" data-action="game-load">读档</button>
+        <button class="vn-tab" type="button" data-action="game-save">存档</button>
+        <button class="vn-tab" type="button" data-action="vn-log">记录</button>
+        <button class="vn-tab vn-tab-ghost" type="button" data-action="to-title">标题</button>
+      </div>
+    </section>
+
+    <!-- ============ 覆盖层：存档 / 读档 ============ -->
+    <div class="overlay" id="modal-slots" data-overlay>
+      <div class="panel panel-wide" role="dialog" aria-modal="true" aria-labelledby="slots-title">
+        <header class="panel-head">
+          <div>
+            <h2 id="slots-title">读取存档</h2>
+            <p class="panel-hint" id="slots-hint">选择一个存档位载入进度</p>
+          </div>
+          <button class="panel-close" type="button" data-close aria-label="关闭">✕</button>
+        </header>
+        <div class="panel-body">
+          <div class="auto-row" id="auto-row"></div>
+          <div class="slot-grid" id="slot-grid"></div>
+        </div>
+        <footer class="panel-foot">
+          <span class="storage-note" id="slots-storage"></span>
+          <span class="foot-actions">
+            <button class="btn btn-danger btn-ghost" type="button" id="btn-wipe">清空全部存档</button>
+            <button class="btn btn-ghost" type="button" data-close>返回</button>
+          </span>
+        </footer>
+      </div>
+    </div>
+
+    <!-- ============ 覆盖层：设置 ============ -->
+    <div class="overlay" id="modal-settings" data-overlay>
+      <div class="panel" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+        <header class="panel-head">
+          <div>
+            <h2 id="settings-title">游戏设置</h2>
+            <p class="panel-hint">设置会自动保存在本机浏览器中</p>
+          </div>
+          <button class="panel-close" type="button" data-close aria-label="关闭">✕</button>
+        </header>
+        <div class="panel-body">
+          <div class="field">
+            <div class="field-head"><label for="set-speed">文字速度</label><output id="set-speed-out">55</output></div>
+            <input type="range" id="set-speed" min="0" max="100" step="1" />
+            <p class="field-tip">数值越大，对话逐字显示越快（100 = 瞬间显示）</p>
+          </div>
+
+          <div class="field">
+            <div class="field-head"><label for="set-sfx">音效音量</label><output id="set-sfx-out">60</output></div>
+            <input type="range" id="set-sfx" min="0" max="100" step="1" />
+            <p class="field-tip">当前音效由浏览器实时合成（暂无音频素材），点击按钮可试听</p>
+          </div>
+
+          <div class="field field-row">
+            <label for="set-bgm">背景音乐</label>
+            <input type="range" id="set-bgm" min="0" max="100" step="1" disabled />
+            <output>待接入素材</output>
+          </div>
+
+          <div class="field field-inline">
+            <label class="switch">
+              <input type="checkbox" id="set-sfx-enabled" />
+              <span class="track"><span class="thumb"></span></span>
+              <span class="switch-label">启用交互音效</span>
+            </label>
+            <label class="switch">
+              <input type="checkbox" id="set-autosave" />
+              <span class="track"><span class="thumb"></span></span>
+              <span class="switch-label">自动存档</span>
+            </label>
+            <label class="switch">
+              <input type="checkbox" id="set-smooth" />
+              <span class="track"><span class="thumb"></span></span>
+              <span class="switch-label">流畅模式<span class="switch-tip">省电 · 关模糊与横移</span></span>
+            </label>
+          </div>
+        </div>
+        <footer class="panel-foot">
+          <button class="btn btn-ghost" type="button" id="btn-fullscreen">切换全屏</button>
+          <button class="btn btn-ghost" type="button" id="btn-reset-settings">恢复默认设置</button>
+          <button class="btn" type="button" data-close>完成</button>
+        </footer>
+      </div>
+    </div>
+
+    <!-- ============ 覆盖层：关于 ============ -->
+    <div class="overlay" id="modal-about" data-overlay>
+      <div class="panel" role="dialog" aria-modal="true" aria-labelledby="about-title">
+        <header class="panel-head">
+          <div>
+            <h2 id="about-title">关于本作</h2>
+          </div>
+          <button class="panel-close" type="button" data-close aria-label="关闭">✕</button>
+        </header>
+        <div class="panel-body about-body">
+          <dl class="about-credits">
+            <div class="about-row"><dt>主创</dt><dd>松松　小帅</dd></div>
+            <div class="about-row"><dt>文案</dt><dd>小帅　松松</dd></div>
+            <div class="about-row"><dt>重大参与者</dt><dd>桐桐</dd></div>
+          </dl>
+
+          <div class="about-join">
+            <p class="about-join-title">想参与一起制作、出镜</p>
+            <p class="about-join-line">vx：<b>bestY264399</b>　（备注来意）</p>
+            <p class="about-join-note">目前正处于起步，还是满缺人手的！可以留名喔！</p>
+          </div>
+        </div>
+        <footer class="panel-foot">
+          <span class="storage-note">当前版本：v0.1.0</span>
+          <button class="btn" type="button" data-close>返回</button>
+        </footer>
+      </div>
+    </div>
+
+    <!-- ============ 覆盖层：确认框 ============ -->
+    <div class="overlay" id="modal-confirm" data-overlay>
+      <div class="panel panel-narrow" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title">
+        <header class="panel-head">
+          <h2 id="confirm-title">确认</h2>
+        </header>
+        <div class="panel-body">
+          <p class="confirm-message" id="confirm-message"></p>
+        </div>
+        <footer class="panel-foot">
+          <span class="storage-note"></span>
+          <span class="foot-actions">
+            <button class="btn btn-ghost" type="button" id="confirm-cancel">取消</button>
+            <button class="btn" type="button" id="confirm-ok">确定</button>
+          </span>
+        </footer>
+      </div>
+    </div>
+
+    <!-- ============ 覆盖层：剧情记录 LOG ============ -->
+    <div class="overlay" id="modal-log" data-overlay>
+      <div class="panel panel-wide" role="dialog" aria-modal="true" aria-labelledby="log-title">
+        <header class="panel-head">
+          <div>
+            <h2 id="log-title">剧情记录</h2>
+            <p class="panel-hint">本章已读过的台词</p>
+          </div>
+          <button class="panel-close" type="button" data-close aria-label="关闭">✕</button>
+        </header>
+        <div class="panel-body log-body" id="log-body"></div>
+        <footer class="panel-foot">
+          <span class="storage-note">越靠下越新</span>
+          <button class="btn" type="button" data-close>返回</button>
+        </footer>
+      </div>
+    </div>
+
+    <!-- ============ Toast ============ -->
+    <div class="toast-layer" id="toast-layer"></div>
+
+    <!-- ============ 竖屏提示条（放在舞台内，跟随画面一起旋转） ============ -->
+    <div class="rotate-bar" id="rotate-hint">
+      <span class="rotate-bar-icon" aria-hidden="true"></span>
+      <span class="rotate-bar-text">请把手机横过来 —— 画面已按横屏排好</span>
+      <button class="rotate-bar-btn" type="button" id="rotate-fullscreen">全屏</button>
+      <button class="rotate-bar-close" type="button" data-rotate-skip aria-label="关闭提示">✕</button>
+    </div>
+
+    <!-- ============ 启动屏 ============ -->
+    <div class="boot" id="boot">
+      <div class="boot-inner">
+        <p class="boot-title">错位夜宵</p>
+        <p class="boot-sub">GALGAME PROTOTYPE v0.1.0</p>
+        <p class="boot-prompt">点击画面开始</p>
+        <p class="boot-note hint-keyboard">点击任意位置进入 · 支持键盘操作</p>
+        <p class="boot-note hint-touch">将自动进入横屏全屏 · 请把手机横过来</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="js/core.js"></script>
+<script src="js/saves.js"></script>
+<script src="js/script.js"></script>
+<script src="js/vn.js"></script>
+<script src="js/mobile.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
