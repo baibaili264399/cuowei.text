@@ -1,4 +1,4 @@
-/* ============================================================
+﻿/* ============================================================
    《错位夜宵》主菜单样式  v0.1.1
    布局基准：16:9 舞台，--u = 舞台宽度的 1%（所有尺寸随窗口等比缩放）
    移动端：body.is-touch 下放大字号与触控热区；竖屏显示"请横屏"覆盖层
@@ -1969,3 +1969,83 @@ body.is-touch .choice-btn { min-height: calc(var(--u) * 6.5); padding: calc(var(
 body.is-touch .choice-text { font-size: calc(var(--u) * 1.75); line-height: 1.45; }
 body.is-touch .choice-key { width: calc(var(--u) * 2.7); height: calc(var(--u) * 2.7); font-size: calc(var(--u) * 1.35); }
 body.is-touch .choice-prompt { font-size: calc(var(--u) * 1.35); }
+
+/* ============================================================
+   素材进度条 → 右上角（原来在屏幕正中，挡视线）
+   ============================================================ */
+.vn-loading {
+  left: auto;
+  right: calc(var(--u) * 3);
+  top: calc(var(--u) * 6.4);
+  transform: none;
+  gap: calc(var(--u) * .8);
+  padding: calc(var(--u) * .5) calc(var(--u) * 1.2);
+  font-size: calc(var(--u) * 1.15);
+  letter-spacing: .08em;
+  background: rgba(6, 12, 22, .74);
+  border-radius: 99px;
+  box-shadow: 0 calc(var(--u) * .4) calc(var(--u) * 1.6) rgba(0, 0, 0, .45);
+}
+.vn-loading::before {
+  width: calc(var(--u) * 1.1);
+  height: calc(var(--u) * 1.1);
+  border-width: 1.5px;
+}
+.vn-loading-bar {
+  display: block;
+  width: calc(var(--u) * 8);
+  height: calc(var(--u) * .62);
+  background: rgba(127, 212, 255, .18);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.vn-loading-bar > i {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, #7fd4ff, #cdebff);
+  border-radius: 99px;
+  transition: width .25s linear;
+}
+.vn-loading-text { font-variant-numeric: tabular-nums; white-space: nowrap; }
+body.is-touch .vn-loading { font-size: calc(var(--u) * 1.5); padding: calc(var(--u) * .7) calc(var(--u) * 1.6); }
+body.is-touch .vn-loading-bar { width: calc(var(--u) * 10); height: calc(var(--u) * .8); }
+
+/* ============================================================
+   面板 / 选项：统一放进"对话框上方"的安全区
+   对话框底边距 5u、高约 14.2u → 上沿在 ~37u；这里所有浮层底边一律停在 34.25u
+   手机屏幕再小也不会被对话框盖住（之前 .vn-ui 的 z-index 14 低于对话框 20，一重叠就被压住）
+   ============================================================ */
+.vn-ui,
+.vn-choice {
+  top: auto !important;
+  bottom: calc(var(--u) * 23) !important;
+  max-height: calc(var(--u) * 27) !important;
+  overflow: hidden;
+}
+/* 选项多的时候列表内部滚动，不撑破安全区 */
+.vn-choice .choice-list {
+  max-height: calc(var(--u) * 22);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+/* 面板/选项打开时，把对话框压暗，视线自然落到面板上（老浏览器不支持 :has 就忽略） */
+.screen-vn:has(.vn-choice.is-on) .dialogue.vn-box,
+.screen-vn:has(.vn-ui.is-on) .dialogue.vn-box { opacity: .4; }
+
+/* 小屏手机（逻辑横屏舞台更窄）再收一点，保证留白 */
+@media (max-height: 420px) {
+  .vn-ui, .vn-choice { bottom: calc(var(--u) * 22.5) !important; max-height: calc(var(--u) * 27) !important; }
+}
+/* 选项 / 面板打开时，右侧那排按钮（回想·自动·跳过·设置）让位：
+   它们本来在选项进行中也点不了，占着位置反而把面板右半边压掉 */
+.screen-vn:has(.vn-choice.is-on) .vn-side,
+.screen-vn:has(.vn-ui.is-on) .vn-side {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s var(--ease);
+}
+/* 顺带把触屏下的面板收窄一点，别贴到屏幕边 */
+body.is-touch .vn-ui[data-type="cast"] { width: calc(var(--u) * 66); }
+body.is-touch .vn-ui[data-type="who"] { width: calc(var(--u) * 52); }
+body.is-touch .vn-choice { width: calc(var(--u) * 62); }

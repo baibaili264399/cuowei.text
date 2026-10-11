@@ -57,7 +57,7 @@ python -m http.server 8123
 ├─ js/main.js                  屏幕切换、菜单交互、存档面板、设置面板
 ├─ assets/images/              标题立绘 mascot / favicon / PWA 图标（192、512）
 ├─ assets/chars/               人物图 6 个：3 张抠图立绘 + 3 张头像卡（照片版，占位）
-├─ assets/scene/               实拍素材 108 张（背景 / CG / 待补占位图，WebP 共 14MB）
+├─ assets/scene/               实拍素材 108 张（背景 / CG / 待补占位图，WebP 共 9.4MB）
 │   ├─ bg-dorm-night / -dusk / -morning       学生宿舍（天黑 / 下午 / 早上）
 │   ├─ bg-class-* bg-corridor* bg-lib-* bg-cc-*  教室 / 走廊 / 图书馆 / 计算中心
 │   ├─ bg-lake bg-bridge* bg-statue* bg-trail* bg-road*  湖畔 / 石桥 / 雕像 / 林间小路 / 主干道
@@ -203,7 +203,7 @@ C:\Users\陆世松\Desktop\错位夜宵2.0\
 | 标题立绘 | `assets/images/mascot.webp`（透明底贴纸），`index.html` 中 `#title-char` | 换 src 即可，发光与呼吸动画已写好 |
 | **人物立绘** | `assets/chars/*-card.webp`（照片胸像，**占位**） | 换成符合人设的立绘后，改 `js/script.js` 里 `{ chars:[{ src }] }` 的 src；透明底立绘再加 `style: 'cutout'` |
 | **缺的图** | `assets/scene/ph-*.webp`（黑底白字「图片待补」） | 补拍 / 画好后**同名覆盖**即可，剧本不用改 |
-| 背景 / CG | `assets/scene/` 108 张实拍（WebP，共 14MB） | 直接换文件或改 `js/script.js` 里的路径；`pos` 控制裁切位置 |
+| 背景 / CG | `assets/scene/` 108 张实拍（WebP，共 9.4MB） | 直接换文件或改 `js/script.js` 里的路径；`pos` 控制裁切位置 |
 | 存档缩略图 | `assets/images/icon-192.png` | 后续接真实截图（`dataURL`） |
 | BGM / 音效 | WebAudio 实时合成音效 | 接入后替换 BGM 音量通道 |
 

@@ -691,6 +691,12 @@
   }
 
   /* ---------------- 计时器 ---------------- */
+  /* 标题页就开始替第一章热身（玩家在菜单停留的时间正好用来加载素材） */
+  function warmupFirstChapter() {
+    if (!GAL.VN || !GAL.VN.warmup) return;
+    try { GAL.VN.warmup('ch1', 12); } catch (e) { /* ignore */ }
+  }
+
   function initTimers() {
     global.setInterval(function () {
       if (state.screen !== 'game') return;
@@ -729,6 +735,12 @@
     document.addEventListener('keydown', enterBoot, { once: true });
   }
 
+  /* 临时：把运行时错误写到 body[data-err] 方便排查 */
+  global.addEventListener('error', function (e) {
+    document.body.setAttribute('data-err',
+      (e.message || 'error') + ' @' + String(e.filename || '').split('/').pop() + ':' + e.lineno);
+  });
+
   /* ---------------- 初始化 ---------------- */
   function init() {
     cacheEls();
@@ -738,6 +750,7 @@
     initDust();
     initParallax();
     initTimers();
+  global.setTimeout(warmupFirstChapter, 350);   /* 标题页就开始替第一章加载素材 */
     bindActions();
     bindGameScreen();
     bindOverlays();
@@ -852,7 +865,27 @@
           }, 520);
         } catch (e5) { document.body.setAttribute('data-choice2', '异常:' + e5.message); }
         return;
-      }      if (hash === 'spritetest') {
+      }      if (hash === 'warmuptest') {                /* 预热自检 */
+        var w1 = GAL.VN.preloadInfo ? GAL.VN.preloadInfo() : { total: -1, done: -1 };
+        GAL.VN.warmup('ch1', 12);
+        var w2 = GAL.VN.preloadInfo();
+        global.setTimeout(function () {
+          var w3 = GAL.VN.preloadInfo();
+          var ok = w3.total > 0 && w3.done > 0;
+          document.body.setAttribute('data-warm',
+            (ok ? 'PASS' : 'FAIL') + ' || 预热前=' + w1.total + ' || 预热后 total=' + w2.total + ' done=' + w2.done +
+            ' || 1.5秒后 done=' + w3.done + '/' + w3.total);
+        }, 1500);
+        return;
+      }
+      if (hash === 'loading') {                   /* 只看进度条样式 */
+        startChapter('ch1', 0);
+        document.getElementById('vn-loading-fill').style.width = '46%';
+        document.getElementById('vn-loading-text').textContent = '素材 12 / 26';
+        document.getElementById('screen-game').classList.add('is-loading');
+        return;
+      }
+      if (hash === 'spritetest') {
         startChapter('ch2', 98);
         global.setTimeout(function () {
           var n = document.querySelector('#vn-chars .vn-char');

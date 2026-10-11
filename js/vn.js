@@ -15,7 +15,7 @@
      'vn-flash', 'vn-glitch', 'vn-glow', 'vn-flashback', 'vn-card', 'vn-card-title', 'vn-card-sub',
      'speaker', 'dialogue-text', 'caret', 'vn-box', 'vn-name',
      'hud-chapter', 'hud-playtime', 'hud-line',
-     'vn-place', 'vn-affinity', 'vn-ui', 'vn-choice',
+     'vn-place', 'vn-affinity', 'vn-ui', 'vn-choice', 'vn-loading-text', 'vn-loading-fill',
      'modal-log', 'log-body', 'toast-layer'].forEach(function (id) {
       el[id] = document.getElementById(id);
     });
@@ -119,15 +119,73 @@
     img.src = url;
   }
 
-  function preloadChapter() {
-    var wanted = {};
-    state.steps.forEach(function (s) {
-      if (s.bg) wanted[s.bg] = 1;
-      if (s.cg) wanted[s.cg] = 1;
-      if (s.char) wanted[s.char] = 1;
+  /* ---------------- 预加载（两段式） ----------------
+     以前是"开章瞬间把整章素材一次全甩出去"：手机上几十个请求一起挤带宽，
+     第 1 张要跟在第 26 张后面排队，于是你看到一长段"读取素材中…"。
+     现在：① 先按剧情顺序把马上要用的前 URGENT 张下完；
+           ② 其余的空闲时分小批补上，不跟首屏抢带宽。 */
+  var URGENT_COUNT = 8;
+  var preloadJob = { token: 0, total: 0, done: 0 };
+
+  function collectChapterAssets(steps) {
+    var seen = {}, order = [];
+    (steps || []).forEach(function (s) {
+      var urls = [];
+      if (s.bg) urls.push(s.bg);
+      if (s.cg) urls.push(s.cg);
+      if (s.char) urls.push(s.char);
+      if (s.chars) s.chars.forEach(function (c) { if (c && c.src) urls.push(c.src); });
+      urls.forEach(function (u) { if (u && !seen[u]) { seen[u] = 1; order.push(u); } });
     });
-    Object.keys(wanted).forEach(function (u) { ensure(u); });
+    return order;
   }
+
+  function refreshLoadingChip() {
+    var txt = el['vn-loading-text'], fill = el['vn-loading-fill'];
+    if (!txt) return;
+    if (preloadJob.total && preloadJob.done < preloadJob.total) {
+      txt.textContent = '素材 ' + preloadJob.done + ' / ' + preloadJob.total;
+    } else {
+      txt.textContent = '读取素材中…';
+    }
+    if (fill) {
+      fill.style.width = (preloadJob.total ? Math.round(preloadJob.done / preloadJob.total * 100) : 0) + '%';
+    }
+  }
+
+  function idleCall(fn, delay) {
+    if (global.requestIdleCallback) global.requestIdleCallback(fn, { timeout: 1200 });
+    else global.setTimeout(fn, delay || 240);
+  }
+
+  function preloadChapter(urgent) {
+    var order = collectChapterAssets(state.steps);
+    var token = ++preloadJob.token;
+    var urgentN = Math.min(urgent == null ? URGENT_COUNT : urgent, order.length);
+    preloadJob.total = order.length;
+    preloadJob.done = 0;
+    refreshLoadingChip();
+
+    function track(u) {
+      ensure(u, function () {
+        if (token !== preloadJob.token) return;
+        preloadJob.done++;
+        refreshLoadingChip();
+      });
+    }
+
+    order.slice(0, urgentN).forEach(track);          /* ① 首屏要用的，立刻下 */
+
+    var rest = order.slice(urgentN), i = 0;          /* ② 其余的，空闲时分批补 */
+    (function pump() {
+      if (token !== preloadJob.token) return;
+      var t0 = Date.now();
+      while (i < rest.length && Date.now() - t0 < 8) track(rest[i++]);
+      if (i < rest.length) idleCall(pump, 380);
+    })();
+  }
+
+
 
   /* ---------------- 视觉层 ---------------- */
   /* 关键：切图绝不"等网络"——图到了就平滑交叉淡入；
@@ -960,4 +1018,19 @@
   GAL.VN.pick = pickChoice;
   GAL.VN.chars = function (list) { setChars({ chars: list }, false); };
   GAL.VN.restore = function (data) { if (data && data.flags) state.flags = data.flags; };
+    /* 标题页就先替第一章热身：玩家在菜单停留的时间正好用来加载素材 */
+    GAL.VN.warmup = function (chapterId, urgent) {
+      var chapters = GAL.Chapters || {};
+      var ch = chapters[chapterId] || chapters[(GAL.chapterOrder || [])[0]];
+      if (!ch) return;
+      var keep = state.steps;
+      state.steps = ch.steps;
+      preloadChapter(urgent == null ? 12 : urgent);
+      state.steps = keep;
+    };
+
+    /* 调试用：看预加载进度 */
+    GAL.VN.preloadInfo = function () {
+      return { total: preloadJob.total, done: preloadJob.done, token: preloadJob.token };
+    };
 })(window);
