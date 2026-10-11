@@ -1,10 +1,13 @@
 # 《错位夜宵》· Galgame 原型 v0.1.0
 
 无 H · 校园向 · 三名可攻略角色 + 回归现实真结局的 Galgame。
-当前进度：**主菜单 + 存档系统 + 手机端适配 + VN 演出引擎 + 第一章剧情实装**。
-标题立绘已换成正式角色图（透明底贴纸）；背景与 CG 为实拍素材。
+当前进度：**主菜单 + 存档系统 + 手机端适配 + VN 演出引擎 + 第一章、第二章剧情实装**。
+背景与 CG 为校园实拍素材；人物立绘目前用照片胸像占位，缺的图在游戏里会显示"图片待补"。
 
-**线上地址**：https://baibaili264399.github.io/songwentong/ （GitHub Pages，手机可直接打开）
+**线上地址**：https://baibaili264399.github.io/cuowei.text/ （GitHub Pages，手机可直接打开）
+
+**更新方式**：双击 `上传更新.bat`（或 `git add -A && git commit -m 更新 && git push`），
+推送后约 1 分钟网页自动生效。
 
 ---
 
@@ -23,7 +26,7 @@ python -m http.server 8123
 
 ## 一之二、手机端（重点）
 
-打开 https://baibaili264399.github.io/songwentong/ 即可，已针对手机做了这些处理：
+打开 https://baibaili264399.github.io/cuowei.text/ 即可，已针对手机做了这些处理：
 
 | 能力 | 说明 |
 |------|------|
@@ -52,25 +55,16 @@ python -m http.server 8123
 ├─ js/vn.js                    **VN 演出引擎**（背景/CG/打字机/自动/跳过/回想/记录/特效）
 ├─ js/mobile.js                移动端适配：触屏识别 / 全屏横屏接管 / 竖屏提示
 ├─ js/main.js                  屏幕切换、菜单交互、存档面板、设置面板
-├─ assets/images/mascot.webp   标题角色立绘（透明底，去水印）
-├─ assets/images/favicon.png   浏览器标签页图标（64²）
-├─ assets/images/icon-192.png  存档缩略图 / PWA 图标（192²）
-├─ assets/images/icon-512.png  PWA 大图标（512²）
-├─ assets/scene/               实拍素材（背景 / CG，全部 WebP，17 张共 1.5MB）
-│   ├─ bg-room-night.webp      深夜出租屋 · 显示器幽光（前情提要）
-│   ├─ bg-bench-close.webp     第一人称坐在长椅上（开场）
-│   ├─ bg-path.webp            林荫步道（抬头四顾）
-│   ├─ bg-ground.webp          脚下地砖（眩晕/低头）
-│   ├─ cg-phone.webp           手机屏幕特写（14:47）
-│   ├─ cg-phone-dark.webp      掏出手机（息屏）
-│   ├─ cg-bench-view.webp      第一视角远望
-│   ├─ cg-hand*.webp           手部特写
-│   └─ bg-canteen*.webp        南食堂（后续章节用）
-└─ docs/
-   ├─ 设定集.md                 世界观 / 系统 / 三名可攻略角色 / 场景 / 剧情结构（全部已敲定设定）
-   ├─ 序章脚本.md               序章正式脚本（叙事 + 镜头 + 台词 + 旁白）
-   ├─ 第一章脚本.md             第一章已实装脚本 + 分镜与素材对应表
-   └─ preview/                 各界面预览截图（含手机横屏 / 竖屏 / 剧情演出）
+├─ assets/images/              标题立绘 mascot / favicon / PWA 图标（192、512）
+├─ assets/chars/               人物图 6 个：3 张抠图立绘 + 3 张头像卡（照片版，占位）
+├─ assets/scene/               实拍素材 108 张（背景 / CG / 待补占位图，WebP 共 14MB）
+│   ├─ bg-dorm-night / -dusk / -morning       学生宿舍（天黑 / 下午 / 早上）
+│   ├─ bg-class-* bg-corridor* bg-lib-* bg-cc-*  教室 / 走廊 / 图书馆 / 计算中心
+│   ├─ bg-lake bg-bridge* bg-statue* bg-trail* bg-road*  湖畔 / 石桥 / 雕像 / 林间小路 / 主干道
+│   ├─ bg-canteen-* bg-store-* bg-gym-* bg-track bg-bleachers  食堂 / 超市 / 体育馆 / 跑道 / 观众台
+│   ├─ cg-wake* cg-bench-phone cg-phone-time  开场 CG（醒来 / 掏手机 / 屏幕时间）
+│   └─ ph-*.webp               黑底白字「图片待补」占位图（补好后同名覆盖即可）
+└─ docs/                       剧本文档、素材清单（**不上传 GitHub**，见 .gitignore）
 ```
 
 > 素材全部压缩为 **WebP** 并按"舞台上真实需要多大"定尺寸：背景 1152×864、CG 900 宽
@@ -79,7 +73,7 @@ python -m http.server 8123
 > 切图**绝不"等网络"**：图到了就平滑交叉淡入；万一没到（慢网 / 请求失败），
 > 最多等 1.2 秒就先把图层指过去，浏览器解码完自然会画出来——避免出现"这一页没有照片"。
 > 失败的图再次用到时会自动重试，不会被一次失败判死。
-> 所有资源都是相对路径，放在 `https://<用户名>.github.io/songwentong/` 这种子路径下也能正常加载。
+> 所有资源都是相对路径，放在 `https://<用户名>.github.io/cuowei.text/` 这种子路径下也能正常加载。
 
 ## 三、本版本已实现
 
@@ -162,17 +156,20 @@ python -m http.server 8123
 > 实际排版视口约为「宽 −30、高 −95」，宽度下限 504px。
 > 想截 844×390 的手机横屏效果，要传 `--window-size=874,485`，否则会按更小的视口排版、截图右侧被裁。
 
-## 四之二、项目位置
+## 四之二、项目位置与上传
 
-本项目的唯一工作目录（此后所有开发都在这里进行）：
+唯一工作目录（此后所有开发都在这里进行）：
 
 ```
-C:\Users\陆世松\Desktop\错位夜宵\
+C:\Users\陆世松\Desktop\错位夜宵2.0\
 ```
 
-- 双击 `打开游戏.bat` 或 `index.html` 即可运行（脚本用 `%~dp0` 取自身路径，整个文件夹可以随意搬动/改名）。
-- 素材（立绘 / 背景 / BGM）请放进 `assets\` 下，代码中统一用相对路径引用。
-- 想备份或发给别人：整个文件夹打包即可，无任何构建步骤、无依赖。
+- 双击 `打开游戏.bat` 或 `index.html` 即可运行（脚本用 `%~dp0` 取自身路径，整个文件夹可随意搬动/改名）。
+- **上传到网页**：双击 `上传更新.bat`；或命令行 `git add -A && git commit -m 更新 && git push`。
+  推送后约 1 分钟，https://baibaili264399.github.io/cuowei.text/ 自动更新。
+- `docs/` 在 `.gitignore` 里，**不会上传**（剧本文档防剧透）。
+- 素材（立绘 / 背景 / BGM）放进 `assets\` 下，代码中统一用相对路径引用。
+- 无任何构建步骤、无依赖；整个文件夹打包即可备份或发给别人。
 
 
 ## 五、存档数据结构
@@ -204,14 +201,20 @@ C:\Users\陆世松\Desktop\错位夜宵\
 | 用途 | 现在 | 替换方式 |
 |------|------|----------|
 | 标题立绘 | `assets/images/mascot.webp`（透明底贴纸），`index.html` 中 `#title-char` | 换 src 即可，发光与呼吸动画已写好 |
-| **剧情立绘** | 暂无（本章没有其他角色出场） | 把立绘 PNG 丢进 `assets/scene/`，脚本里加一步 `{ char: 'assets/scene/xxx.png' }` 即可，`.vn-chars` 层与 `setChar()` 已实现 |
-| 背景 / CG | `assets/scene/` 17 张实拍（WebP，共 1.5MB） | 直接换文件或改 `js/script.js` 里的路径；`pos` 控制裁切位置 |
+| **人物立绘** | `assets/chars/*-card.webp`（照片胸像，**占位**） | 换成符合人设的立绘后，改 `js/script.js` 里 `{ chars:[{ src }] }` 的 src；透明底立绘再加 `style: 'cutout'` |
+| **缺的图** | `assets/scene/ph-*.webp`（黑底白字「图片待补」） | 补拍 / 画好后**同名覆盖**即可，剧本不用改 |
+| 背景 / CG | `assets/scene/` 108 张实拍（WebP，共 14MB） | 直接换文件或改 `js/script.js` 里的路径；`pos` 控制裁切位置 |
 | 存档缩略图 | `assets/images/icon-192.png` | 后续接真实截图（`dataURL`） |
 | BGM / 音效 | WebAudio 实时合成音效 | 接入后替换 BGM 音量通道 |
 
-## 七、下一步（按你的节奏）
+## 七、进度与下一步
 
-1. 第一章完整剧情 + 三位角色（郑桐 / 阿松 / 小帅）初遇脚本
-2. 好感度可视化 UI、剧情修正 BUG 预警 UI
-3. 三线分支与结局解锁表（TRUE END / STAY END / 三个 BE）
-4. 立绘、背景、BGM、UI 音效素材接入
+**已实装**
+- 第一章：长椅醒来 → 确认真穿越 → 三人姓名与好感浮现 → 小郑的游戏邀约分支 → 校园踩点认地点 → 论坛查阿松
+- 第二章：上午专业课（小郑的距离）→ 图书馆初见小帅 → 湖畔第一次对话分支（坦诚 / 装傻）→ 双线并线接到"计算中心"匿名帖
+
+**下一步**
+1. 帖子下面的评论（阿松线的变数）
+2. 三人各自的个人线推进与好感事件
+3. 通道分岔（谁是等你的人）+ 三线分支与结局表
+4. 人物立绘、BGM、UI 音效素材接入
