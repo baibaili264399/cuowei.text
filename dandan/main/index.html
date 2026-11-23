@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#5b9bd5">
+<title>丹丹大冒险 · 1-1</title>
+<style>
+  html,body{margin:0;padding:0;height:100%;background:#12100f;overflow:hidden;touch-action:none;
+    -webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
+  #wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+  canvas{display:block;image-rendering:auto}
+  #boot{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    background:#12100f;color:#f5e9c8;font:600 15px/1.8 "PingFang SC","Microsoft YaHei",system-ui,sans-serif;z-index:9}
+  #bar{width:210px;height:5px;background:#2a241f;border-radius:3px;overflow:hidden;margin-top:14px}
+  #fill{height:100%;width:0;background:#e8b23c;transition:width .12s linear}
+  #err{position:fixed;left:0;right:0;bottom:0;color:#ffb3b3;font:12px/1.5 monospace;
+    background:#1a0d0d;padding:8px;white-space:pre-wrap;z-index:20;display:none}
+  #touch{position:fixed;inset:0;z-index:5;display:none;pointer-events:none}
+  .btn{position:absolute;bottom:4vh;width:88px;height:88px;border-radius:50%;
+    background:rgba(30,24,20,.34);border:3px solid rgba(245,233,200,.55);pointer-events:auto;
+    display:flex;align-items:center;justify-content:center;color:#f5e9c8;font:700 30px/1 system-ui}
+  #bL{left:3vw}#bR{left:calc(3vw + 100px)}#bJ{right:4vw;width:104px;height:104px;font-size:22px}
+  .btn:active{background:rgba(232,178,60,.45)}
+  #rotate{position:fixed;inset:0;display:none;align-items:center;justify-content:center;
+    background:rgba(10,8,14,.9);color:#f5e9c8;z-index:30;pointer-events:none;
+    font:600 15px/1.8 system-ui,sans-serif;letter-spacing:.08em}
+  @media (orientation:portrait) and (max-width:900px){#rotate{display:flex}}
+</style>
+
+<style id="m-touch">
+  html,body{touch-action:none;overscroll-behavior:none;-webkit-user-select:none;user-select:none;
+    -webkit-tap-highlight-color:transparent}
+  canvas{display:block;touch-action:none}
+</style>
+</head>
+<body>
+<div id="wrap"><canvas id="cv"></canvas></div>
+<div id="touch"><div class="btn" id="bL">◀</div><div class="btn" id="bR">▶</div><div class="btn" id="bJ">跳</div></div>
+<div id="boot"><div>丹丹大冒险</div><div id="bar"><div id="fill"></div></div></div>
+<div id="rotate">把手机横过来 ◻↔◻</div>
+<pre id="err"></pre>
+<script>
+window.__err = [];
+window.onerror = function (m, s, l, c) {
+  window.__err.push(m + ' @' + l + ':' + c);
+  var e = document.getElementById('err'); e.style.display = 'block'; e.textContent = window.__err.join('\n');
+};
+</script>
+<script src="game.js"></script>
+<script src="stage2.js"></script>
+<script src="stage3.js"></script>
+<script src="story4.js"></script>
+</body>
+</html>
